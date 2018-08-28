@@ -64,5 +64,4 @@ caller.call(body)
   |**pagedRequest**|If your call has pagination and you want the pagination to be handled for you you can set this to true|`false`|
   |**ordered**|If you request has order parameters you can set this to true|`false`|
   |**hasQueryMap**|If you want to pass extra query map parameter to the call you can set this to true|`false`|
-**
 
