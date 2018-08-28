@@ -2,76 +2,53 @@
 
 **This is a wrapper around Retrofit to make your use of library in app-level so much easier. This will make your classes of retrofit implementation with just one annotation and omits the boilerplate for you. ;)**
   
-  ### Problem: (Don't do these steps)
-  **1-** First you want to create a class which is responsible for holding an instance of retrofit which will create your caller classes from your interfaces:
-```kotlin
-object RetroKeeper {  
-          val retro: Retrofit by lazy{  
-          val rconfig = RetroConfig() //this class is for holding the configuration of the retrofit  
-                  val r = Retrofit.Builder()  
-                  r.baseUrl(rconfig.baseUrl)  
-                  rconfig.converters.forEach({r.addConverterFactory(it)})  
-                  rconfig.callAdapters.forEach({r.addCallAdapterFactory(it)})  
-                  r.build()  
-                  }  
-}
-```
-  
-  **2-** Then let's say You want to call a server API with the class below:
-```kotlin
-interface GetUserProfileCall {  
-          @GET("user/{username}/profile")  
-          fun call(@Path("username") username: String): Observable<User>  
-}
-```
-      
-  
-  **3-** Then you might want a class responsible for creating the Call and handling the response and progress like this:
-```kotlin
-class GetUserProfileCaller {  
-  	    private val api: GetUserProfileCall = RetroKeeper.retro.create(GetUserProfileCall::class.java)  
-    
-  	    private val obsScheduler: Scheduler = RetroConfig().observeScheduler  
-    
-  	    private lateinit var username: String  
-    
-  	    private var progress: ProgressHandler? = null  
-    
-  	    fun call(@Path("username") username: String, progress: ProgressHandler? = null): Observable<User> {  
-  	        this.username = username  
-  	        this.progress = progress  
-  	        return api.call(username)  
-  	        .observeOn(obsScheduler)  
-  	        .subscribeOn(Schedulers.io())  
-  	        .doOnSubscribe{ progress?.showProgress() }  
-  	        .doOnError{ progress?.showError() }
-  	        .doOnNext{ progress?.hideProgress() }  
-  	    }  
-  	}
-```
-      
-  ### Solution: (Do these steps instead)
-  You don't need to do any of the above. For the configuration of the retrofit you just have to create a config class which implements the `BaseConfig` class and is annotated with `@RetroConfig`:
+  ### Usage
+  **1-** For the configuration of the retrofit create a class which implements the `BaseConfig` class and is annotated with `@RetroConfig`:
 ```kotlin
 @RetroConfig  
 class RetroConfig : BaseConfig {  
-    override val baseUrl: String  
-        get() = "https://myurl.com"  
-    override val converters: List<Converter.Factory> = arrayListOf(LoganSquareConverterFactory.create())  
-    override val callAdapters: List<CallAdapter.Factory> = arrayListOf(RxJava2CallAdapterFactory.create())  
-    override val observeScheduler: Scheduler  
-        get() = AndroidSchedulers.mainThread()  
+     override val baseUrl: String  
+         get() = "https://myurl.com"  
+     override val converters: List<Converter.Factory> = arrayListOf(LoganSquareConverterFactory.create())  
+     override val callAdapters: List<CallAdapter.Factory> = arrayListOf(RxJava2CallAdapterFactory.create())  
+     override val observeScheduler: Scheduler  
+         get() = AndroidSchedulers.mainThread()  
 }
 ```
-      
-  And for making all those classes above just create an empty interface and annotate it with `@Request`:
+  
+**2-**   For each of your requests make an empty interface and annotate it with `@Request`:
 ```kotlin
 @Request(  
-          url = "user/{username}/profile",  
-          verb = Verb.GET,  
-          returnType = User::class  
-          )  
+       url = "user/{username}/profile",  
+       verb = Verb.GET,  
+       returnType = User::class  
+       )  
 interface GetUserProfile
+```
+
+And just like this for post requests:
+```kotlin
+@Request(  
+       url = "user/signin",  
+       verb = Verb.POST,  
+       returnType = User::class,
+       bodyType = RequestBody::class
+       )  
+interface SignIn
+```
+      
+As simple as that you can call your APIs like this:
+```kotlin
+var caller = GetUserProfileCaller()
+caller.call("saeednt")
+    .subscribe{...}
+```
+And
+```kotlin
+var caller = SignInCaller()
+var body = RequestBody()
+caller.call(body)
+    .subscribe{...}
 ```
       
   ### Extra configuration:
