@@ -4,8 +4,8 @@
   
   ### Problem: (Don't do these steps)
   **1-** First you want to create a class which is responsible for holding an instance of retrofit which will create your caller classes from your interfaces:
-  
-      object RetroKeeper {  
+```kotlin
+object RetroKeeper {  
           val retro: Retrofit by lazy{  
           val rconfig = RetroConfig() //this class is for holding the configuration of the retrofit  
                   val r = Retrofit.Builder()  
@@ -14,18 +14,21 @@
                   rconfig.callAdapters.forEach({r.addCallAdapterFactory(it)})  
                   r.build()  
                   }  
-      }
+}
+```
   
   **2-** Then let's say You want to call a server API with the class below:
-  
-      interface GetUserProfileCall {  
+```kotlin
+interface GetUserProfileCall {  
           @GET("user/{username}/profile")  
           fun call(@Path("username") username: String): Observable<User>  
-      }
+}
+```
+      
   
   **3-** Then you might want a class responsible for creating the Call and handling the response and progress like this:
-  
-      class GetUserProfileCaller {  
+```kotlin
+class GetUserProfileCaller {  
   	    private val api: GetUserProfileCall = RetroKeeper.retro.create(GetUserProfileCall::class.java)  
     
   	    private val obsScheduler: Scheduler = RetroConfig().observeScheduler  
@@ -45,26 +48,32 @@
   	        .doOnNext{ progress?.hideProgress() }  
   	    }  
   	}
+```
+      
   ### Solution: (Do these steps instead)
   You don't need to do any of the above. For the configuration of the retrofit you just have to create a config class which implements the `BaseConfig` class and is annotated with `@RetroConfig`:
-  
-      @RetroConfig  
-      class RetroConfig : BaseConfig {  
-  	    override val baseUrl: String  
-  	        get() = "https://myurl.com"  
-  	    override val converters: List<Converter.Factory> = arrayListOf(LoganSquareConverterFactory.create())  
-  	    override val callAdapters: List<CallAdapter.Factory> = arrayListOf(RxJava2CallAdapterFactory.create())  
-  	    override val observeScheduler: Scheduler  
-  		get() = AndroidSchedulers.mainThread()  
-  	}
+```kotlin
+@RetroConfig  
+class RetroConfig : BaseConfig {  
+    override val baseUrl: String  
+        get() = "https://myurl.com"  
+    override val converters: List<Converter.Factory> = arrayListOf(LoganSquareConverterFactory.create())  
+    override val callAdapters: List<CallAdapter.Factory> = arrayListOf(RxJava2CallAdapterFactory.create())  
+    override val observeScheduler: Scheduler  
+        get() = AndroidSchedulers.mainThread()  
+}
+```
+      
   And for making all those classes above just create an empty interface and annotate it with `@Request`:
-  
-      @Request(  
+```kotlin
+@Request(  
           url = "user/{username}/profile",  
           verb = Verb.GET,  
           returnType = User::class  
           )  
-      interface GetUserProfile
+interface GetUserProfile
+```
+      
   ### Extra configuration:
   In the `@Request` annotation you can find these options:
   
