@@ -37,7 +37,7 @@ And just like this for post requests:
 interface SignIn
 ```
       
-As simple as that you can call your APIs like this:
+As simple as that. You can call your APIs like this:
 ```kotlin
 var caller = GetUserProfileCaller()
 caller.call("saeednt")
