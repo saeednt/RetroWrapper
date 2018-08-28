@@ -1,0 +1,46 @@
+apply plugin: 'kotlin-kapt'
+apply plugin: 'java-library'
+apply plugin: 'kotlin'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    api 'com.squareup:kotlinpoet:1.0.0-RC1'
+    implementation 'com.google.auto.service:auto-service:1.0-rc2'
+    implementation 'com.squareup.retrofit2:retrofit:2.4.0'
+    implementation 'io.reactivex.rxjava2:rxkotlin:2.3.0'
+    kapt "com.google.auto.service:auto-service:1.0-rc2"
+    implementation project(':RetroWrapper')
+}
+
+ext {
+    bintrayRepo = 'RetroWrapper'
+    bintrayName = 'com.nt.retrowrapper'
+
+    libraryName = 'RetroWrapperCompiler'
+
+    publishedGroupId = 'com.nt.retrowrapper'
+    artifact = 'compiler'
+    libraryVersion = '0.1.1'
+
+    libraryDescription = 'This is a wrapper around Retrofit to make your use of library in app-level so much easier.'
+    siteUrl = 'https://github.com/saeednt/RetroWrapper'
+    gitUrl = 'https://github.com/saeednt/RetroWrapper.git'
+    developerId = 'saeednt'
+    developerName = 'Saeed Entezari'
+    developerEmail = 'saeedenti@gmail.com'
+    licenseName = 'Apache License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0'
+    allLicenses = ['Apache-2.0']
+
+}
+
+clean.finalizedBy(jar)
+
+if (project.rootProject.file('local.properties').exists()) {
+    apply from: 'https://raw.githubusercontent.com/brightec/JCenter/master/installv1.gradle'
+    apply from: 'https://raw.githubusercontent.com/brightec/JCenter/master/bintrayv1.gradle'
+}
