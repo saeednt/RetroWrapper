@@ -91,7 +91,7 @@ and
 </dependency>
 ```
 
-Or you can download the library and compiler from bintray in .jar format. It will be published to jcenter soon:
+Or you can download the library and compiler from bintray in .jar format:
 [Bintray Repo](https://bintray.com/saeednt/RetroWrapper/com.nt.retrowrapper)
 
 Note that you have to add the compiler dependency using `kapt ...`
