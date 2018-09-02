@@ -83,12 +83,12 @@ And for maven:
 ```
 and
 ```xml
-<dependency>
+<annotationProcessorPath>
  <groupId>com.nt.retrowrapper</groupId>
  <artifactId>compiler</artifactId>
  <version>0.1.3</version>
  <type>pom</type> 
-</dependency>
+</annotationProcessorPath>
 ```
 
 Or you can download the library and compiler from bintray in .jar format:
