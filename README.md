@@ -68,3 +68,7 @@ caller.call(body)
 ###Installation
 For now you must download the library and compiler from bintray in .jar format. It will be published to jcenter soon:
 [Bintray Repo](https://bintray.com/saeednt/RetroWrapper/com.nt.retrowrapper)
+
+Note that you have to add the compiler dependency using `kapt ...`
+
+And the library dependency using `implementation ...`
