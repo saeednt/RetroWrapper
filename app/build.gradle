@@ -6,6 +6,20 @@ apply plugin: 'kotlin-android-extensions'
 
 apply plugin: 'kotlin-kapt'
 
+
+sourceSets {
+    main {
+        java {
+            srcDir "${buildDir.absolutePath}/generated/source/kapt/debug"
+        }
+    }
+}
+
+kapt {
+    correctErrorTypes = true
+    mapDiagnosticLocations = true
+}
+
 android {
     compileSdkVersion 28
     defaultConfig {
@@ -38,6 +52,18 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    implementation project(':RetroWrapper')
+    api project(path: ':RetroWrapper')
     kapt project(':RetroWrapperCompiler')
+}
+
+apply plugin: 'idea'
+
+idea {
+    module {
+        println("idea plugin")
+        println(sourceDirs)
+        sourceDirs += files('build/generated/source/kapt/main', 'build/generated/source/kaptKotlin/debug')
+        generatedSourceDirs += files('build/generated/source/kapt/main', 'build/generated/source/kaptKotlin/debug')
+        print(sourceDirs)
+    }
 }

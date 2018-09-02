@@ -24,7 +24,7 @@ ext {
 
     publishedGroupId = 'com.nt.retrowrapper'
     artifact = 'compiler'
-    libraryVersion = '0.1.1'
+    libraryVersion = '0.1.2'
 
     libraryDescription = 'This is a wrapper around Retrofit to make your use of library in app-level so much easier.'
     siteUrl = 'https://github.com/saeednt/RetroWrapper'

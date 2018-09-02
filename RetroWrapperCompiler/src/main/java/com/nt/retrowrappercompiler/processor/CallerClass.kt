@@ -7,15 +7,21 @@ import com.nt.retrowrappercompiler.RWrapper
 import com.squareup.kotlinpoet.*
 import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
+import retrofit2.Callback
 import java.io.File
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Element
 import javax.lang.model.element.PackageElement
 import javax.lang.model.type.TypeMirror
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import retrofit2.Call
+import retrofit2.Response
+import javax.lang.model.type.MirroredTypeException
 
 internal object CallerClass {
     private lateinit var processingEnv: ProcessingEnvironment
 
+    private lateinit var request: Request
     private lateinit var callerFileName: String
     private lateinit var callerFileBuilder: FileSpec.Builder
     private lateinit var callerClassBuilder: TypeSpec.Builder
@@ -23,10 +29,17 @@ internal object CallerClass {
     private lateinit var progressParameter: ParameterSpec
     private lateinit var callFunctionBuilder: FunSpec.Builder
     private lateinit var apiCallCodeBlock: CodeBlock.Builder
+    private lateinit var enqueueBuilder: FunSpec.Builder
+
+
+    private var pack: PackageElement? = null
 
     internal fun generate(processingEnv: ProcessingEnvironment, retroConfigPack: PackageElement, retroConfigClass: TypeMirror, it: Element?, pack: PackageElement?, callInterface: TypeSpec, abstractCallFunction: FunSpec, requestAnnotation: Request) {
         CallerClass.processingEnv = processingEnv
         CallerClass.abstractCallFunction = abstractCallFunction
+
+        this.request = requestAnnotation
+        this.pack = pack
 
         callerFileName = it?.simpleName.toString() + "Caller"
         callerFileBuilder = FileSpec.builder(pack.toString(), callerFileName)
@@ -97,13 +110,18 @@ internal object CallerClass {
                         apiCallCodeBlock.add(",\n")
                     }
                 }
+
         apiCallCodeBlock
                 .add(")\n")
-                .add(".observeOn(obsScheduler)\n")
-                .add(".subscribeOn(%T.io())\n", Schedulers::class)
-                .add(".doOnSubscribe{ progress?.showProgress() }\n")
-                .add(".doOnError{ progress?.showError() }\n")
-                .add(".doOnNext{ progress?.hideProgress() }\n")
+        if (request.rxEnabled) {
+
+            apiCallCodeBlock
+                    .add(".observeOn(obsScheduler)\n")
+                    .add(".subscribeOn(%T.io())\n", Schedulers::class)
+                    .add(".doOnSubscribe{ progress?.showProgress() }\n")
+                    .add(".doOnError{ progress?.showError() }\n")
+                    .add(".doOnNext{ progress?.hideProgress() }\n")
+        }
     }
 
     private fun generateCallFunction() {
@@ -115,8 +133,18 @@ internal object CallerClass {
                             || it.name.equals("order")
                             || it.name.equals("orderBy")
                 })
-                .returns(abstractCallFunction.returnType!!)
+        if (request.rxEnabled) {
+            callFunctionBuilder
+                    .returns(abstractCallFunction.returnType!!)
+        } else {
+            callFunctionBuilder.returns(ClassName(pack.toString(), callerClassBuilder.build().name!!))
+        }
+
         callFunctionBuilder.addParameter(progressParameter)
+
+        if (request.rxEnabled.not()) {
+            generateEnqueueFunction()
+        }
 
         val callFunctionBody = CodeBlock.builder()
 
@@ -140,7 +168,10 @@ internal object CallerClass {
                 .add(progressParameter.name)
                 .add("\n")
 
-        callFunctionBody.add(apiCallCodeBlock.build())
+        if (request.rxEnabled)
+            callFunctionBody.add(apiCallCodeBlock.build())
+        else
+            callFunctionBody.add("return this\n")
 
         callFunctionBuilder.addCode(
                 callFunctionBody.build()
@@ -149,6 +180,34 @@ internal object CallerClass {
         callerClassBuilder.addFunction(
                 callFunctionBuilder.build()
         )
+    }
+
+    private fun generateEnqueueFunction() {
+        enqueueBuilder = FunSpec.builder("enqueue")
+        var enqueueCodeBlock = CodeBlock.builder()
+        enqueueCodeBlock.add("progress?.showProgress()\n")
+        try {
+            request.returnType
+        } catch (e: MirroredTypeException) {
+            enqueueBuilder.addParameter(
+                    ParameterSpec.builder("callback", Callback::class.asTypeName().parameterizedBy(e.typeMirror.asTypeName())).build()
+            )
+            enqueueCodeBlock.add(apiCallCodeBlock.build())
+                    .add(".enqueue(object: %1T<%2T>{\n", Callback::class, e.typeMirror)
+            enqueueCodeBlock.add("override fun onFailure(call: %1T<%2T>, t: %3T) {\n", Call::class, e.typeMirror, Throwable::class)
+                    .add("progress?.showError()\n")
+                    .add("callback.onFailure(call, t)\n")
+                    .add("}\n")
+            enqueueCodeBlock.add("override fun onResponse(call: %1T<%2T>, response: %3T) {\n", Call::class, e.typeMirror, Response::class.asTypeName().parameterizedBy(e.typeMirror.asTypeName()))
+                    .add("progress?.hideProgress()\n")
+                    .add("callback.onResponse(call, response)\n")
+                    .add("}\n")
+        }
+        enqueueCodeBlock.add("})\n")
+
+        enqueueBuilder.addCode(enqueueCodeBlock.build())
+
+        callerClassBuilder.addFunction(enqueueBuilder.build())
     }
 
     private fun generateNextPageFunction() {
