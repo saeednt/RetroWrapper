@@ -39,13 +39,13 @@ interface SignIn
       
 As simple as that. You can call your APIs like this:
 ```kotlin
-var caller = GetUserProfileCaller()
+var caller = GetUserProfileCaller() //this is the name of the interface + Caller
 caller.call("saeednt")
     .subscribe{...}
 ```
 And
 ```kotlin
-var caller = SignInCaller()
+var caller = SignInCaller() //this is the name of the interface + Caller
 var body = RequestBody()
 caller.call(body)
     .subscribe{...}
