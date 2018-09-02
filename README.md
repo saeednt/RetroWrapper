@@ -66,7 +66,32 @@ caller.call(body)
   |**hasQueryMap**|If you want to pass extra query map parameter to the call you can set this to true|`false`|
 
 ### Installation
-For now you must download the library and compiler from bintray in .jar format. It will be published to jcenter soon:
+For gradle:
+```groovy
+implementation 'com.nt.retrowrapper:wrapper:0.1.3'
+kapt 'com.nt.retrowrapper:compiler:0.1.3'
+```
+
+And for maven:
+```xml
+<dependency>
+ <groupId>com.nt.retrowrapper</groupId>
+ <artifactId>wrapper</artifactId>
+ <version>0.1.3</version>
+ <type>pom</type> 
+</dependency>
+```
+and
+```xml
+<dependency>
+ <groupId>com.nt.retrowrapper</groupId>
+ <artifactId>compiler</artifactId>
+ <version>0.1.3</version>
+ <type>pom</type> 
+</dependency>
+```
+
+Or you can download the library and compiler from bintray in .jar format. It will be published to jcenter soon:
 [Bintray Repo](https://bintray.com/saeednt/RetroWrapper/com.nt.retrowrapper)
 
 Note that you have to add the compiler dependency using `kapt ...`
