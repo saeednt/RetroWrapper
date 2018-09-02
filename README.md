@@ -65,7 +65,7 @@ caller.call(body)
   |**ordered**|If you request has order parameters you can set this to true|`false`|
   |**hasQueryMap**|If you want to pass extra query map parameter to the call you can set this to true|`false`|
 
-###Installation
+### Installation
 For now you must download the library and compiler from bintray in .jar format. It will be published to jcenter soon:
 [Bintray Repo](https://bintray.com/saeednt/RetroWrapper/com.nt.retrowrapper)
 
