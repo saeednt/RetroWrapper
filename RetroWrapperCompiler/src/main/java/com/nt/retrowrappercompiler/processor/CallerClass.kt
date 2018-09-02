@@ -50,7 +50,7 @@ internal object CallerClass {
 
         progressParameter = ParameterSpec.builder("progress", ProgressHandler::class.asTypeName().asNullable()).defaultValue("null").build()
 
-        generateCallerProperties(pack, callInterface, retroConfigPack, retroConfigClass)
+        generateCallerProperties(pack, callInterface, retroConfigPack, retroConfigClass, requestAnnotation)
 
         generateApiCallCodeBlock()
 
@@ -66,20 +66,22 @@ internal object CallerClass {
         callerFileBuilder.build().writeTo(File(kaptKotlinGeneratedDir, "$callerFileName.kt"))
     }
 
-    private fun generateCallerProperties(pack: PackageElement?, callInterface: TypeSpec, retroConfigPack: PackageElement, retroConfigClass: TypeMirror) {
+    private fun generateCallerProperties(pack: PackageElement?, callInterface: TypeSpec, retroConfigPack: PackageElement, retroConfigClass: TypeMirror, requestAnnotation: Request) {
         callerClassBuilder.addProperty(PropertySpec.builder("api", ClassName(pack.toString(), callInterface.name!!))
                 .mutable(false)
                 .addModifiers(KModifier.PRIVATE)
                 .initializer("%1T.retro.create(%2T::class.java)", ClassName(retroConfigPack.toString(), "RetroKeeper"), ClassName(pack.toString(), callInterface.name!!))
                 .build())
 
-        callerClassBuilder.addProperty(
-                PropertySpec.builder("obsScheduler", Scheduler::class.java)
-                        .mutable(false)
-                        .addModifiers(KModifier.PRIVATE)
-                        .initializer("%T().observeScheduler", retroConfigClass)
-                        .build()
-        )
+        if (requestAnnotation.rxEnabled) {
+            callerClassBuilder.addProperty(
+                    PropertySpec.builder("obsScheduler", Scheduler::class.java)
+                            .mutable(false)
+                            .addModifiers(KModifier.PRIVATE)
+                            .initializer("%T().observeScheduler", retroConfigClass)
+                            .build()
+            )
+        }
 
         abstractCallFunction.parameters
                 .filterNot {
