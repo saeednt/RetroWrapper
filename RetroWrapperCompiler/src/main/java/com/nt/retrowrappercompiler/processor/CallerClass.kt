@@ -20,7 +20,6 @@ import javax.lang.model.type.MirroredTypeException
 
 internal object CallerClass {
     private lateinit var processingEnv: ProcessingEnvironment
-
     private lateinit var request: Request
     private lateinit var callerFileName: String
     private lateinit var callerFileBuilder: FileSpec.Builder
@@ -35,9 +34,8 @@ internal object CallerClass {
     private var pack: PackageElement? = null
 
     internal fun generate(processingEnv: ProcessingEnvironment, retroConfigPack: PackageElement, retroConfigClass: TypeMirror, it: Element?, pack: PackageElement?, callInterface: TypeSpec, abstractCallFunction: FunSpec, requestAnnotation: Request) {
-        CallerClass.processingEnv = processingEnv
-        CallerClass.abstractCallFunction = abstractCallFunction
-
+        this.processingEnv = processingEnv
+        this.abstractCallFunction = abstractCallFunction
         this.request = requestAnnotation
         this.pack = pack
 
@@ -115,8 +113,8 @@ internal object CallerClass {
 
         apiCallCodeBlock
                 .add(")\n")
-        if (request.rxEnabled) {
 
+        if (request.rxEnabled) {
             apiCallCodeBlock
                     .add(".observeOn(obsScheduler)\n")
                     .add(".subscribeOn(%T.io())\n", Schedulers::class)

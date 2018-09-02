@@ -8,5 +8,5 @@ import com.nt.retrowrapper.annots.Request;
         verb = Verb.GET,
         returnType = MyTestRequest.class
 )
-interface MyTestRequest {
+public interface MyTestRequest {
 }
