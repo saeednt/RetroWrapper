@@ -1,11 +1,10 @@
 package com.nt.retrowrappercompiler
 
 import com.google.auto.service.AutoService
-import com.nt.retrowrappercompiler.processor.CallInterface
-import com.nt.retrowrappercompiler.processor.CallerClass
-import com.nt.retrowrappercompiler.processor.RetrofitWrapper
+import com.nt.retrowrapper.annots.CRUDRequest
 import com.nt.retrowrapper.annots.Request
 import com.nt.retrowrapper.annots.RetroConfig
+import com.nt.retrowrappercompiler.processor.*
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
@@ -26,7 +25,7 @@ class RWrapper : AbstractProcessor() {
     }
 
     override fun getSupportedAnnotationTypes(): MutableSet<String> {
-        return mutableSetOf(Request::class.java.name)
+        return mutableSetOf(RetroConfig::class.java.name)
     }
 
     override fun process(p0: MutableSet<out TypeElement>?, p1: RoundEnvironment?): Boolean {
@@ -62,6 +61,7 @@ class RWrapper : AbstractProcessor() {
                     pack,
                     requestAnnotation
             )
+
             CallerClass.generate(
                     processingEnv,
                     retroConfigPack!!,
@@ -72,6 +72,35 @@ class RWrapper : AbstractProcessor() {
                     CallInterface.callFunction,
                     requestAnnotation
             )
+        }
+
+        p1.getElementsAnnotatedWith(CRUDRequest::class.java)?.forEach {
+            val pack = processingEnv.elementUtils.getPackageOf(it)
+            val crudRequest = it.getAnnotation(CRUDRequest::class.java)
+
+            CRUDInterface.generate(
+                    processingEnv,
+                    config,
+                    it,
+                    pack,
+                    crudRequest
+            )
+
+            CRUDCallerClass.generate(
+                    processingEnv,
+                    retroConfigPack!!,
+                    retroConfigClass!!,
+                    it,
+                    pack,
+                    CRUDInterface.crudInterfaceBuilder,
+                    CRUDInterface.getFun,
+                    CRUDInterface.getListFun,
+                    CRUDInterface.postFun,
+                    CRUDInterface.putFun,
+                    CRUDInterface.deleteFun,
+                    crudRequest
+            )
+
         }
 
         return true

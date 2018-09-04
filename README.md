@@ -54,7 +54,7 @@ caller.call(body)
   ### Extra configuration:
   In the `@Request` annotation you can find these options:
   
-  | Paremeter | Usage | Default|
+  | Parameter | Usage | Default|
   |-|-|-|
   |**url**|The url part which is added to call function annotation|-|
   |**verb**|The http verb for retrofit call|-|
