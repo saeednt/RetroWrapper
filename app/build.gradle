@@ -1,3 +1,5 @@
+import org.w3c.dom.NodeList
+
 apply plugin: 'com.android.application'
 
 apply plugin: 'kotlin-android'
@@ -55,6 +57,7 @@ dependencies {
     api project(path: ':RetroWrapper')
     kapt project(':RetroWrapperCompiler')
 }
+/*
 
 apply plugin: 'idea'
 
@@ -63,4 +66,5 @@ idea {
         sourceDirs += files('build/generated/source/kapt/main', 'build/generated/source/kaptKotlin/debug')
         generatedSourceDirs += files('build/generated/source/kapt/main', 'build/generated/source/kaptKotlin/debug')
     }
-}
+
+}*/

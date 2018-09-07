@@ -1,11 +1,10 @@
 package com.nt.retrofitwrapper
 
-import com.nt.retrowrapper.Verb
-import com.nt.retrowrapper.annots.Request
+import com.nt.retrowrapper.annots.CRUDRequest
 
-@Request(
-        url = "user/{username}/profile",
-        verb = Verb.GET,
-        returnType = User::class
+@CRUDRequest(
+        url = "user",
+        entity = User::class,
+        request = User::class
 )
 interface GetUserProfile

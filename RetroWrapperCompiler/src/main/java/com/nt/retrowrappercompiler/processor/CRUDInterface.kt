@@ -7,8 +7,7 @@ import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import io.reactivex.Observable
 import okhttp3.ResponseBody
-import retrofit2.http.GET
-import retrofit2.http.Path
+import retrofit2.http.*
 import java.io.File
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Element
@@ -38,7 +37,7 @@ internal object CRUDInterface {
         this.element = it
         this.request = crudRequest
 
-        crudInterfaceFileName = it.simpleName.toString() + "Caller"
+        crudInterfaceFileName = it.simpleName.toString() + "Call"
         crudInterfaceFileBuilder = FileSpec.builder(pack.toString(), crudInterfaceFileName)
         crudInterfaceBuilder = TypeSpec.interfaceBuilder(crudInterfaceFileName)
 
@@ -63,27 +62,27 @@ internal object CRUDInterface {
         try {
             request.entity
         } catch (e: MirroredTypeException) {
-            this.getFun.returns(Observable::class.asTypeName().parameterizedBy(e.typeMirror.asTypeName()))
-            this.getListFun.returns(Observable::class.asTypeName().parameterizedBy(List::class.asTypeName().parameterizedBy(e.typeMirror.asTypeName())))
+            this.getFun.returns(Observable::class.asTypeName().parameterizedBy(e.typeMirror.asTypeName())).addModifiers(KModifier.ABSTRACT)
+            this.getListFun.returns(Observable::class.asTypeName().parameterizedBy(List::class.asTypeName().parameterizedBy(e.typeMirror.asTypeName()))).addModifiers(KModifier.ABSTRACT)
         }
-        this.postFun.returns(Observable::class.asTypeName().parameterizedBy(ResponseBody::class.asTypeName()))
-        this.putFun.returns(Observable::class.asTypeName().parameterizedBy(ResponseBody::class.asTypeName()))
-        this.deleteFun.returns(Observable::class.asTypeName().parameterizedBy(ResponseBody::class.asTypeName()))
+        this.postFun.returns(Observable::class.asTypeName().parameterizedBy(ResponseBody::class.asTypeName())).addModifiers(KModifier.ABSTRACT)
+        this.putFun.returns(Observable::class.asTypeName().parameterizedBy(ResponseBody::class.asTypeName())).addModifiers(KModifier.ABSTRACT)
+        this.deleteFun.returns(Observable::class.asTypeName().parameterizedBy(ResponseBody::class.asTypeName())).addModifiers(KModifier.ABSTRACT)
     }
 
     private fun generateAnnotations() {
-        this.getListFun.addAnnotation(AnnotationSpec.builder(GET::class).addMember(request.url).build())
-        this.getFun.addAnnotation(AnnotationSpec.builder(GET::class).addMember(request.url + "/{id}").build())
-        this.postFun.addAnnotation(AnnotationSpec.builder(GET::class).addMember(request.url + "/{id}").build())
-        this.putFun.addAnnotation(AnnotationSpec.builder(GET::class).addMember(request.url + "/{id}").build())
-        this.deleteFun.addAnnotation(AnnotationSpec.builder(GET::class).addMember(request.url + "/{id}").build())
+        this.getListFun.addAnnotation(AnnotationSpec.builder(GET::class).addMember("%S", request.url).build())
+        this.getFun.addAnnotation(AnnotationSpec.builder(GET::class).addMember("%S", request.url + "/{id}").build())
+        this.postFun.addAnnotation(AnnotationSpec.builder(POST::class).addMember("%S", request.url + "/{id}").build())
+        this.putFun.addAnnotation(AnnotationSpec.builder(PUT::class).addMember("%S", request.url + "/{id}").build())
+        this.deleteFun.addAnnotation(AnnotationSpec.builder(DELETE::class).addMember("%S", request.url + "/{id}").build())
     }
 
     private fun generateParams() {
-        this.getFun.addParameter(ParameterSpec.builder("id", Int::class).addAnnotation(AnnotationSpec.builder(Path::class).addMember("id").build()).build())
-        this.postFun.addParameter(ParameterSpec.builder("id", Int::class).addAnnotation(AnnotationSpec.builder(Path::class).addMember("id").build()).build())
-        this.putFun.addParameter(ParameterSpec.builder("id", Int::class).addAnnotation(AnnotationSpec.builder(Path::class).addMember("id").build()).build())
-        this.deleteFun.addParameter(ParameterSpec.builder("id", Int::class).addAnnotation(AnnotationSpec.builder(Path::class).addMember("id").build()).build())
+        this.getFun.addParameter(ParameterSpec.builder("id", Int::class).addAnnotation(AnnotationSpec.builder(Path::class).addMember("%S", "id").build()).build())
+        this.postFun.addParameter(ParameterSpec.builder("id", Int::class).addAnnotation(AnnotationSpec.builder(Path::class).addMember("%S", "id").build()).build())
+        this.putFun.addParameter(ParameterSpec.builder("id", Int::class).addAnnotation(AnnotationSpec.builder(Path::class).addMember("%S", "id").build()).build())
+        this.deleteFun.addParameter(ParameterSpec.builder("id", Int::class).addAnnotation(AnnotationSpec.builder(Path::class).addMember("%S", "id").build()).build())
     }
 
     private fun addFunctionsToInterface() {
