@@ -65,7 +65,7 @@ caller.call(body)
   |**ordered**|If you request has order parameters you can set this to true|`false`|
   |**hasQueryMap**|If you want to pass extra query map parameter to the call you can set this to true|`false`|
 
-### Installation [![Download](https://api.bintray.com/packages/saeednt/RetroWrapper/com.nt.retrowrapper/images/download.svg)](https://bintray.com/saeednt/RetroWrapper/com.nt.retrowrapper/_latestVersion)
+### Installation [![Latest Version](https://api.bintray.com/packages/saeednt/RetroWrapper/com.nt.retrowrapper/images/download.svg)](https://bintray.com/saeednt/RetroWrapper/com.nt.retrowrapper/_latestVersion)
 For gradle:
 ```groovy
 implementation 'com.nt.retrowrapper:wrapper:latest_version'
