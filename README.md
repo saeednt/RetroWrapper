@@ -65,11 +65,11 @@ caller.call(body)
   |**ordered**|If you request has order parameters you can set this to true|`false`|
   |**hasQueryMap**|If you want to pass extra query map parameter to the call you can set this to true|`false`|
 
-### Installation
+### Installation [![Download](https://api.bintray.com/packages/saeednt/RetroWrapper/com.nt.retrowrapper/images/download.svg)](https://bintray.com/saeednt/RetroWrapper/com.nt.retrowrapper/_latestVersion)
 For gradle:
 ```groovy
-implementation 'com.nt.retrowrapper:wrapper:0.1.3'
-kapt 'com.nt.retrowrapper:compiler:0.1.3'
+implementation 'com.nt.retrowrapper:wrapper:latest_version'
+kapt 'com.nt.retrowrapper:compiler:latest_version'
 ```
 
 And for maven:
@@ -77,7 +77,7 @@ And for maven:
 <dependency>
  <groupId>com.nt.retrowrapper</groupId>
  <artifactId>wrapper</artifactId>
- <version>0.1.3</version>
+ <version>latest_version</version>
  <type>pom</type> 
 </dependency>
 ```
@@ -86,7 +86,7 @@ and
 <annotationProcessorPath>
  <groupId>com.nt.retrowrapper</groupId>
  <artifactId>compiler</artifactId>
- <version>0.1.3</version>
+ <version>latest_version</version>
  <type>pom</type> 
 </annotationProcessorPath>
 ```
